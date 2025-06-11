@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CowClicker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; 
+    background: #f4f9ff;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    color: #222;
+    user-select: none;
+  }
+  header {
+    background: #1e88e5;
+    width: 100%;
+    padding: 12px 0;
+    color: white;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(30,136,229,0.4);
+  }
+  .banner {
+    background: #ffc107;
+    padding: 8px 16px;
+    color: #222;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 12px 0;
+    border-radius: 8px;
+    box-shadow: 0 3px 5px rgba(255,193,7,0.5);
+  }
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 450px;
+    width: 100%;
+    padding: 0 16px 40px;
+  }
+  #cow-container {
+    position: relative;
+    margin: 40px 0 30px;
+  }
+  #cow {
+    width: 180px;
+    height: 180px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    user-select: none;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  }
+  #cow:active {
+    transform: scale(1.2);
+  }
+  .popup-text {
+    position: absolute;
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: #1e88e5;
+    user-select: none;
+    pointer-events: none;
+    animation: popfade 1s forwards;
+    font-family: 'Inter', sans-serif;
+    text-shadow: 0 0 3px rgba(30,136,229,0.8);
+  }
+  .popup-text.auto {
+    color: #43a047;
+    text-shadow: 0 0 3px rgba(67,160,71,0.8);
+  }
+  @keyframes popfade {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1.2);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-50px) scale(1);
+    }
+  }
+  #golden-cow {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    cursor: pointer;
+    top: 10%;
+    left: 10%;
+    display: none;
+    border-radius: 12px;
+    box-shadow: 0 0 15px 5px gold;
+    z-index: 10;
+    user-select: none;
+  }
+  #stats {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    padding: 20px 25px;
+    font-size: 1.1rem;
+    margin-bottom: 24px;
+    color: #444;
+  }
+  #stats strong {
+    color: #1e88e5;
+  }
+  #upgrades {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    padding: 24px 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .upgrade {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .upgrade-info {
+    flex-grow: 1;
+  }
+  .upgrade-name {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #222;
+  }
+  .upgrade-desc {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 3px;
+  }
+  .upgrade-price {
+    font-weight: 700;
+    color: #1e88e5;
+    margin-right: 16px;
+    min-width: 70px;
+    text-align: right;
+  }
+  button.buy-btn {
+    background: #1e88e5;
+    border: none;
+    color: white;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+  }
+  button.buy-btn:disabled {
+    background: #90caf9;
+    cursor: not-allowed;
+  }
+  button.buy-btn:hover:not(:disabled) {
+    background: #1565c0;
+  }
+  footer {
+    font-size: 0.9rem;
+    color: #999;
+    margin: 12px 0 8px;
+    user-select: none;
+    text-align: center;
+  }
+  #made-by {
+    font-size: 1rem;
+    color: #555;
+    margin-top: 8px;
+  }
+  #settings {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    width: 100%;
+    max-width: 450px;
+    padding: 20px 25px;
+    margin: 0 0 24px;
+  }
+  #settings h2 {
+    margin-top: 0;
+    font-weight: 700;
+    color: #1e88e5;
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+  }
+  #settings label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+  }
+  #volume-slider {
+    width: 100%;
+    margin: 10px 0 20px;
+    height: 8px;
+    border-radius: 6px;
+    background: #90caf9;
+    cursor: pointer;
+  }
+  #volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    background: #1e88e5;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    margin-top: -7px;
+    transition: background 0.3s ease;
+  }
+  #volume-slider:hover::-webkit-slider-thumb {
+    background: #1565c0;
+  }
+  #volume-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    background: #1e88e5;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    transition: background 0.3s ease;
+  }
+  #volume-slider:hover::-moz-range-thumb {
+    background: #1565c0;
+  }
+</style>
+</head>
+<body>
+<header>CowClicker</header>
+<div class="banner">Updates coming soon!</div>
+
+<main>
+  <div id="cow-container">
+    <img src="cow.png" alt="Cow" id="cow" />
+    <img src="cow.png" alt="Golden Cow" id="golden-cow" />
+  </div>
+
+  <div id="stats">
+    <div><strong>Cows:</strong> <span id="cow-count">0</span></div>
+    <div><strong>Cows per click:</strong> <span id="cows-per-click">1</span></div>
+    <div><strong>Cows per second:</strong> <span id="cows-per-sec">0</span></div>
+    <div><strong>Rebirths:</strong> <span id="rebirth-count">0</span></div>
+    <div><strong>Rebirth multiplier:</strong> <span id="rebirth-multiplier">1x</span></div>
+  </div>
+
+  <div id="upgrades"></div>
+
+  <button id="rebirth-btn" style="
+    margin: 16px 0 0;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 10px;
+    border: none;
+    background: #f57c00;
+    color: white;
+    cursor: pointer;
+  ">Rebirth</button>
+
+  <section id="settings">
+    <h2>Settings</h2>
+    <label for="volume-slider">Background Music Volume</label>
+    <input type="range" id="volume-slider" min="0" max="100" value="30" />
+    <label><input type="checkbox" id="mute-checkbox" /> Mute Music</label>
+  </section>
+</main>
+
+<div id="made-by">Made by Mike</div>
+<footer>© 2025 CowClicker. All rights reserved.</footer>
+
+<audio id="click-sound" src="clicksound1.mp3" preload="auto"></audio>
+<audio id="bg-music" src="background1.mp3" preload="auto" loop></audio>
+
+<script>
+(() => {
+  const cow = document.getElementById('cow');
+  const goldenCow = document.getElementById('golden-cow');
+  const cowCountEl = document.getElementById('cow-count');
+  const cowsPerClickEl = document.getElementById('cows-per-click');
+  const cowsPerSecEl = document.getElementById('cows-per-sec');
+  const rebirthCountEl = document.getElementById('rebirth-count');
+  const rebirthMultiplierEl = document.getElementById('rebirth-multiplier');
+  const upgradesContainer = document.getElementById('upgrades');
+  const clickSound = document.getElementById('click-sound');
+  const cowContainer = document.getElementById('cow-container');
+  const rebirthBtn = document.getElementById('rebirth-btn');
+
+  const bgMusic = document.getElementById('bg-music');
+  const volumeSlider = document.getElementById('volume-slider');
+  const muteCheckbox = document.getElementById('mute-checkbox');
+
+  // Game State
+  let cows = 0;
+  let baseClick = 1;
+  let baseAuto = 0;
+  let rebirths = 0;
+  const rebirthThreshold = 100000;
+
+  // Upgrades
+  const upgrades = [
+    {
+      id: 'poor-multiplier',
+      name: 'Poor Cow Multiplier',
+      desc: 'Adds +1 cows per click',
+      basePrice: 5,
+      count: 0,
+      effect: 1,
+      price() { return Math.floor(this.basePrice * Math.pow(1.15, this.count)); },
+      applyEffect() { baseClick += this.effect; },
+    },
+    {
+      id: 'poor-auto',
+      name: 'Poor Auto Cow',
+      desc: 'Adds +1 cows per second',
+      basePrice: 15,
+      count: 0,
+      effect: 1,
+      price() { return Math.floor(this.basePrice * Math.pow(1.15, this.count)); },
+      applyEffect() { baseAuto += this.effect; },
+    },
+    {
+      id: 'good-multiplier',
+      name: 'Good Cow Multiplier',
+      desc: 'Adds +2 cows per click',
+      basePrice: 25,
+      count: 0,
+      effect: 2,
+      price() { return Math.floor(this.basePrice * Math.pow(1.2, this.count)); },
+      applyEffect() { baseClick += this.effect; },
+    },
+    {
+      id: 'good-auto',
+      name: 'Good Auto Cow',
+      desc: 'Adds +2 cows per second',
+      basePrice: 30,
+      count: 0,
+      effect: 2,
+      price() { return Math.floor(this.basePrice * Math.pow(1.2, this.count)); },
+      applyEffect() { baseAuto += this.effect; },
+    },
+  ];
+
+  // Calculate rebirth multiplier
+  function getRebirthMultiplier() {
+    // Each rebirth multiplies base by 3.5
+    // +1.2x per 10,000 cows accumulated before rebirth
+    let bonusMultiplier = 1 + Math.floor(cows / 10000) * 1.2;
+    return rebirths > 0 ? 3.5 * bonusMultiplier * rebirths : 1;
+  }
+
+  // Update UI
+  function updateUI() {
+    cowCountEl.textContent = Math.floor(cows);
+    cowsPerClickEl.textContent = (baseClick * getRebirthMultiplier()).toFixed(1);
+    cowsPerSecEl.textContent = (baseAuto * getRebirthMultiplier()).toFixed(1);
+    rebirthCountEl.textContent = rebirths;
+    rebirthMultiplierEl.textContent = getRebirthMultiplier().toFixed(2) + 'x';
+
+    upgrades.forEach(upg => {
+      const btn = document.getElementById(`buy-${upg.id}`);
+      if (btn) {
+        btn.textContent = `Buy (${upg.price()} cows)`;
+        btn.disabled = cows < upg.price();
+        const countEl = document.getElementById(`count-${upg.id}`);
+        if (countEl) countEl.textContent = upg.count;
+      }
+    });
+  }
+
+  // Popup animation for clicks and auto
+  function showPopup(text, x, y, isAuto = false) {
+    const popup = document.createElement('div');
+    popup.className = 'popup-text' + (isAuto ? ' auto' : '');
+    popup.style.left = `${x}px`;
+    popup.style.top = `${y}px`;
+    popup.textContent = text;
+    cowContainer.appendChild(popup);
+    setTimeout(() => popup.remove(), 1000);
+  }
+
+  // Click event on cow
+  cow.addEventListener('click', e => {
+    let increment = baseClick * getRebirthMultiplier();
+
+    // Golden cow clicked?
+    if (goldenCow.style.display === 'block') {
+      increment = cows * 10;
+      goldenCow.style.display = 'none';
+      showPopup(`+${Math.floor(increment)} (GOLD!)`, e.offsetX, e.offsetY);
+    } else {
+      showPopup(`+${Math.floor(increment)}`, e.offsetX, e.offsetY);
+    }
+
+    cows += increment;
+    clickSound.currentTime = 0;
+    clickSound.play();
+    updateUI();
+  });
+
+  // Golden cow random appearance
+  function randomGoldenCow() {
+    const showChance = 0.005; // 0.5% chance each second
+    if (goldenCow.style.display === 'none' && Math.random() < showChance) {
+      // Random position inside container
+      const containerRect = cowContainer.getBoundingClientRect();
+      const x = Math.random() * (containerRect.width - goldenCow.width);
+      const y = Math.random() * (containerRect.height - goldenCow.height);
+      goldenCow.style.left = x + 'px';
+      goldenCow.style.top = y + 'px';
+      goldenCow.style.display = 'block';
+    }
+  }
+  goldenCow.style.display = 'none';
+
+  goldenCow.addEventListener('click', e => {
+    // Prevent bubbling to avoid double click counting
+    e.stopPropagation();
+  });
+
+  // Buy upgrade function
+  function buyUpgrade(id) {
+    const upg = upgrades.find(u => u.id === id);
+    if (!upg) return;
+    const cost = upg.price();
+    if (cows >= cost) {
+      cows -= cost;
+      upg.count++;
+      upg.applyEffect();
+      updateUI();
+      // Show popup for auto upgrades only
+      if (id.includes('auto')) {
+        showPopup(`+${upg.effect} auto`, cow.clientWidth/2, cow.clientHeight/2, true);
+      }
+    }
+  }
+
+  // Generate upgrades UI
+  function renderUpgrades() {
+    upgrades.forEach(upg => {
+      const div = document.createElement('div');
+      div.className = 'upgrade';
+      div.innerHTML = `
+        <div class="upgrade-info">
+          <div class="upgrade-name">${upg.name} <span id="count-${upg.id}">0</span></div>
+          <div class="upgrade-desc">${upg.desc}</div>
+        </div>
+        <div>
+          <span class="upgrade-price" id="price-${upg.id}">${upg.price()}</span>
+          <button class="buy-btn" id="buy-${upg.id}">Buy (${upg.price()} cows)</button>
+        </div>
+      `;
+      upgradesContainer.appendChild(div);
+
+      const btn = div.querySelector('button');
+      btn.addEventListener('click', () => buyUpgrade(upg.id));
+    });
+  }
+
+  // Auto cows per second
+  setInterval(() => {
+    if (baseAuto > 0) {
+      const increment = baseAuto * getRebirthMultiplier();
+      cows += increment;
+      updateUI();
+      // Show auto popup at random position on cow
+      const x = cow.clientWidth * Math.random();
+      const y = cow.clientHeight * Math.random();
+      showPopup(`+${Math.floor(increment)}`, x, y, true);
+    }
+    randomGoldenCow();
+  }, 1000);
+
+  // Rebirth on click if eligible
+  function tryRebirth() {
+    if (cows >= rebirthThreshold) {
+      if (confirm(`You have enough cows to rebirth!\nRebirth will reset cows and upgrades but multiply clicks and auto cows by 3.5x plus bonuses.\nRebirth now?`)) {
+        cows = 0;
+        baseClick = 1;
+        baseAuto = 0;
+        rebirths++;
+        upgrades.forEach(upg => upg.count = 0);
+        upgradesContainer.innerHTML = '';
+        renderUpgrades();
+        updateUI();
+        alert('Rebirth complete! Your multipliers increased!');
+      }
+    } else {
+      alert(`You need ${rebirthThreshold} cows to rebirth.\nCurrent cows: ${Math.floor(cows)}`);
+    }
+  }
+  rebirthBtn.addEventListener('click', tryRebirth);
+
+  // Initial setup
+  renderUpgrades();
+  updateUI();
+
+  // Background Music Controls
+  // Start muted because many browsers block autoplay otherwise
+  bgMusic.volume = 0.3;
+  bgMusic.muted = false;
+  bgMusic.play().catch(() => {
+    // Playback might be blocked, no worries
+  });
+
+  // Sync slider & mute checkbox logic
+  volumeSlider.addEventListener('input', () => {
+    if (!muteCheckbox.checked) {
+      const vol = volumeSlider.value / 100;
+      bgMusic.volume = vol;
+    }
+  });
+
+  muteCheckbox.addEventListener('change', () => {
+    if (muteCheckbox.checked) {
+      bgMusic.muted = true;
+    } else {
+      bgMusic.muted = false;
+      bgMusic.volume = volumeSlider.value / 100;
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
