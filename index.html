@@ -1,247 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>CowClicker</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0; 
-    background: #f4f9ff;
-    font-family: 'Inter', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    color: #222;
-    user-select: none;
-  }
-  header {
-    background: #1e88e5;
-    width: 100%;
-    padding: 12px 0;
-    color: white;
-    text-align: center;
-    font-weight: 700;
-    font-size: 1.8rem;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 6px rgba(30,136,229,0.4);
-  }
-  .banner {
-    background: #ffc107;
-    padding: 8px 16px;
-    color: #222;
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin: 12px 0;
-    border-radius: 8px;
-    box-shadow: 0 3px 5px rgba(255,193,7,0.5);
-  }
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 450px;
-    width: 100%;
-    padding: 0 16px 40px;
-  }
-  #cow-container {
-    position: relative;
-    margin: 40px 0 30px;
-  }
-  #cow {
-    width: 180px;
-    height: 180px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-    user-select: none;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-  }
-  #cow:active {
-    transform: scale(1.2);
-  }
-  .popup-text {
-    position: absolute;
-    font-weight: 700;
-    font-size: 1.6rem;
-    color: #1e88e5;
-    user-select: none;
-    pointer-events: none;
-    animation: popfade 1s forwards;
-    font-family: 'Inter', sans-serif;
-    text-shadow: 0 0 3px rgba(30,136,229,0.8);
-  }
-  .popup-text.auto {
-    color: #43a047;
-    text-shadow: 0 0 3px rgba(67,160,71,0.8);
-  }
-  @keyframes popfade {
-    0% {
-      opacity: 1;
-      transform: translateY(0) scale(1.2);
+  <title>CowClicker — Clicker Game</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- Open Graph tags -->
+  <meta property="og:title" content="CowClicker — Fun Clicker Game" />
+  <meta property="og:description" content="Click to collect cows and unlock cool upgrades!" />
+  <meta property="og:image" content="https://cowclicker.mooo.com/path-to-image.png" />
+  <meta property="og:url" content="https://cowclicker.mooo.com" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter Card (optional, works on Twitter and some others) -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="CowClicker — Fun Clicker Game" />
+  <meta name="twitter:description" content="Click to collect cows and unlock cool upgrades!" />
+  <meta name="twitter:image" content="https://cowclicker.mooo.com/path-to-image.png" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    * {
+      box-sizing: border-box;
     }
-    100% {
-      opacity: 0;
-      transform: translateY(-50px) scale(1);
+    body {
+      margin: 0; 
+      background: #f4f9ff;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #222;
+      user-select: none;
     }
-  }
-  #golden-cow {
-    position: absolute;
-    width: 140px;
-    height: 140px;
-    cursor: pointer;
-    top: 10%;
-    left: 10%;
-    display: none;
-    border-radius: 12px;
-    box-shadow: 0 0 15px 5px gold;
-    z-index: 10;
-    user-select: none;
-  }
-  #stats {
-    width: 100%;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    padding: 20px 25px;
-    font-size: 1.1rem;
-    margin-bottom: 24px;
-    color: #444;
-  }
-  #stats strong {
-    color: #1e88e5;
-  }
-  #upgrades {
-    width: 100%;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    padding: 24px 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-  .upgrade {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .upgrade-info {
-    flex-grow: 1;
-  }
-  .upgrade-name {
-    font-weight: 700;
-    font-size: 1.15rem;
-    color: #222;
-  }
-  .upgrade-desc {
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 3px;
-  }
-  .upgrade-price {
-    font-weight: 700;
-    color: #1e88e5;
-    margin-right: 16px;
-    min-width: 70px;
-    text-align: right;
-  }
-  button.buy-btn {
-    background: #1e88e5;
-    border: none;
-    color: white;
-    font-weight: 700;
-    padding: 10px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.3s ease;
-  }
-  button.buy-btn:disabled {
-    background: #90caf9;
-    cursor: not-allowed;
-  }
-  button.buy-btn:hover:not(:disabled) {
-    background: #1565c0;
-  }
-  footer {
-    font-size: 0.9rem;
-    color: #999;
-    margin: 12px 0 8px;
-    user-select: none;
-    text-align: center;
-  }
-  #made-by {
-    font-size: 1rem;
-    color: #555;
-    margin-top: 8px;
-  }
-  #settings {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    width: 100%;
-    max-width: 450px;
-    padding: 20px 25px;
-    margin: 0 0 24px;
-  }
-  #settings h2 {
-    margin-top: 0;
-    font-weight: 700;
-    color: #1e88e5;
-    font-size: 1.3rem;
-    margin-bottom: 16px;
-  }
-  #settings label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #333;
-  }
-  #volume-slider {
-    width: 100%;
-    margin: 10px 0 20px;
-    height: 8px;
-    border-radius: 6px;
-    background: #90caf9;
-    cursor: pointer;
-  }
-  #volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 22px;
-    height: 22px;
-    background: #1e88e5;
-    cursor: pointer;
-    border-radius: 50%;
-    border: none;
-    margin-top: -7px;
-    transition: background 0.3s ease;
-  }
-  #volume-slider:hover::-webkit-slider-thumb {
-    background: #1565c0;
-  }
-  #volume-slider::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
-    background: #1e88e5;
-    cursor: pointer;
-    border-radius: 50%;
-    border: none;
-    transition: background 0.3s ease;
-  }
-  #volume-slider:hover::-moz-range-thumb {
-    background: #1565c0;
-  }
-</style>
+    header {
+      background: #1e88e5;
+      width: 100%;
+      padding: 12px 0;
+      color: white;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 6px rgba(30,136,229,0.4);
+    }
+    .banner {
+      background: #ffc107;
+      padding: 8px 16px;
+      color: #222;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 12px 0;
+      border-radius: 8px;
+      box-shadow: 0 3px 5px rgba(255,193,7,0.5);
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 450px;
+      width: 100%;
+      padding: 0 16px 40px;
+    }
+    #cow-container {
+      position: relative;
+      margin: 40px 0 30px;
+    }
+    #cow {
+      width: 180px;
+      height: 180px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      user-select: none;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    #cow:active {
+      transform: scale(1.2);
+    }
+    .popup-text {
+      position: absolute;
+      font-weight: 700;
+      font-size: 1.6rem;
+      color: #1e88e5;
+      user-select: none;
+      pointer-events: none;
+      animation: popfade 1s forwards;
+      font-family: 'Inter', sans-serif;
+      text-shadow: 0 0 3px rgba(30,136,229,0.8);
+    }
+    .popup-text.auto {
+      color: #43a047;
+      text-shadow: 0 0 3px rgba(67,160,71,0.8);
+    }
+    @keyframes popfade {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1.2);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-50px) scale(1);
+      }
+    }
+    #golden-cow {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      cursor: pointer;
+      top: 10%;
+      left: 10%;
+      display: none;
+      border-radius: 12px;
+      box-shadow: 0 0 15px 5px gold;
+      z-index: 10;
+      user-select: none;
+    }
+    #stats {
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      padding: 20px 25px;
+      font-size: 1.1rem;
+      margin-bottom: 24px;
+      color: #444;
+    }
+    #stats strong {
+      color: #1e88e5;
+    }
+    #upgrades {
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      padding: 24px 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .upgrade {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .upgrade-info {
+      flex-grow: 1;
+    }
+    .upgrade-name {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #222;
+    }
+    .upgrade-desc {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 3px;
+    }
+    .upgrade-price {
+      font-weight: 700;
+      color: #1e88e5;
+      margin-right: 16px;
+      min-width: 70px;
+      text-align: right;
+    }
+    button.buy-btn {
+      background: #1e88e5;
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+    }
+    button.buy-btn:disabled {
+      background: #90caf9;
+      cursor: not-allowed;
+    }
+    button.buy-btn:hover:not(:disabled) {
+      background: #1565c0;
+    }
+    footer {
+      font-size: 0.9rem;
+      color: #999;
+      margin: 12px 0 8px;
+      user-select: none;
+      text-align: center;
+    }
+    #made-by {
+      font-size: 1rem;
+      color: #555;
+      margin-top: 8px;
+    }
+    #settings {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      width: 100%;
+      max-width: 450px;
+      padding: 20px 25px;
+      margin: 0 0 24px;
+    }
+    #settings h2 {
+      margin-top: 0;
+      font-weight: 700;
+      color: #1e88e5;
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+    }
+    #settings label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+    }
+    #volume-slider {
+      width: 100%;
+      margin: 10px 0 20px;
+      height: 8px;
+      border-radius: 6px;
+      background: #90caf9;
+      cursor: pointer;
+    }
+    #volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      background: #1e88e5;
+      cursor: pointer;
+      border-radius: 50%;
+      border: none;
+      margin-top: -7px;
+      transition: background 0.3s ease;
+    }
+    #volume-slider:hover::-webkit-slider-thumb {
+      background: #1565c0;
+    }
+    #volume-slider::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      background: #1e88e5;
+      cursor: pointer;
+      border-radius: 50%;
+      border: none;
+      transition: background 0.3s ease;
+    }
+    #volume-slider:hover::-moz-range-thumb {
+      background: #1565c0;
+    }
+  </style>
 </head>
 <body>
 <header>CowClicker</header>
